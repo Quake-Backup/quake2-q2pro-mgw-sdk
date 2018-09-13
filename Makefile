@@ -3,9 +3,9 @@ PREFIX64 := x86_64-w64-mingw32-
 
 ZLIB_VER := 1.2.11
 JPEG_VER := 9c
-PNG_VER := 1.6.34
-CURL_VER := 7.59.0
-OPENAL_VER := 1.18.2
+PNG_VER := 1.6.35
+CURL_VER := 7.61.1
+OPENAL_VER := 1.19.0
 
 ZLIB := zlib-$(ZLIB_VER)
 JPEG := jpeg-$(JPEG_VER)
@@ -52,8 +52,11 @@ glext.h:
 wglext.h:
 	wget https://www.khronos.org/registry/OpenGL/api/GL/wglext.h
 
+khrplatform.h:
+	wget https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h
+
 fetch: fetch-stamp
-fetch-stamp: $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h
+fetch-stamp: $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h khrplatform.h
 	sha256sum -c checksum
 	touch $@
 
@@ -156,7 +159,7 @@ clean:
 	rm -f *-stamp
 
 install: all
-	install -d $(INC) $(LIB) $(LIB64) $(INC)/curl $(INC)/AL $(INC)/GL
+	install -d $(INC) $(LIB) $(LIB64) $(INC)/curl $(INC)/AL $(INC)/GL $(INC)/KHR
 	install -m 644 build/$(ZLIB)/zconf.h $(INC)/zconf.h
 	install -m 644 build/$(ZLIB)/zlib.h $(INC)/zlib.h
 	install -m 644 build/$(ZLIB)/libz.a $(LIB)/libz.a
@@ -175,4 +178,5 @@ install: all
 	install -m 644 build64/$(PNG)/libpng.a $(LIB64)/libpng.a
 	install -m 644 build64/$(CURL)/lib/libcurl.a $(LIB64)/libcurl.a
 	install -m 644 glext.h wglext.h $(INC)/GL
+	install -m 644 khrplatform.h $(INC)/KHR
 	install -m 644 build/$(OPENAL)/include/AL/* $(INC)/AL
