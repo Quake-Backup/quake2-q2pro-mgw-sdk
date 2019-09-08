@@ -26,7 +26,7 @@ INCLUDES=-I../q2pro-mgw-sdk/inc -DUSE_PACKETDUP=1
 LIBS=-L../q2pro-mgw-sdk/lib
 
 CURL_CFLAGS=-DCURL_STATICLIB
-CURL_LIBS=-lcurl
+CURL_LIBS=-lcurl -lcrypt32
 
 PNG_CFLAGS=
 PNG_LIBS=-lpng

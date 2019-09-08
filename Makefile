@@ -3,9 +3,11 @@ PREFIX64 := x86_64-w64-mingw32-
 
 ZLIB_VER := 1.2.11
 JPEG_VER := 9c
-PNG_VER := 1.6.35
-CURL_VER := 7.61.1
-OPENAL_VER := 1.19.0
+PNG_VER := 1.6.37
+CURL_VER := 7.66.0
+OPENAL_VER := 1.19.1
+OPENGL_VER := 3e75f416136bc7d386857265dda1f970ec7473a3
+EGL_VER := a9bef577b041caab108257ea386d0302290d4361
 
 ZLIB := zlib-$(ZLIB_VER)
 JPEG := jpeg-$(JPEG_VER)
@@ -19,7 +21,10 @@ PNG_TAR := $(PNG).tar.xz
 CURL_TAR := $(CURL).tar.xz
 OPENAL_TAR := $(OPENAL).tar.bz2
 
+ALL_TAR := $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h khrplatform.h
+
 CURL_CFLAG_EXTRAS := -DCURL_STATICLIB -DHTTP_ONLY -DCURL_DISABLE_CRYPTO_AUTH
+CURL_CFG := -zlib -ipv6 -winssl
 
 INC := $(DESTDIR)inc
 LIB := $(DESTDIR)lib
@@ -47,18 +52,21 @@ $(OPENAL_TAR):
 	wget http://kcat.strangesoft.net/openal-releases/$(OPENAL_TAR)
 
 glext.h:
-	wget https://www.khronos.org/registry/OpenGL/api/GL/glext.h
+	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/glext.h
 
 wglext.h:
-	wget https://www.khronos.org/registry/OpenGL/api/GL/wglext.h
+	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/wglext.h
 
 khrplatform.h:
-	wget https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h
+	wget https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/$(EGL_VER)/api/KHR/khrplatform.h
 
 fetch: fetch-stamp
-fetch-stamp: $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h khrplatform.h
+fetch-stamp: $(ALL_TAR)
 	sha256sum -c checksum
 	touch $@
+
+genchecksum: $(ALL_TAR)
+	sha256sum $(ALL_TAR) > checksum
 
 extract: extract-stamp
 extract-stamp: fetch-stamp
@@ -108,10 +116,11 @@ png-stamp: zlib-stamp
 
 curl: curl-stamp
 curl-stamp: zlib-stamp
-	ZLIB_PATH=../../$(ZLIB) ZLIB=1 IPV6=1 \
+	ZLIB_PATH=../../$(ZLIB) \
 	$(MAKE) -C build/$(CURL)/lib -f Makefile.m32 \
 		CROSSPREFIX="$(PREFIX)" \
 		CURL_CFLAG_EXTRAS="$(CURL_CFLAG_EXTRAS)" \
+		CFG="$(CURL_CFG)" \
 		libcurl.a
 	touch $@
 
@@ -147,10 +156,11 @@ png64-stamp: zlib64-stamp
 
 curl64: curl64-stamp
 curl64-stamp: zlib64-stamp
-	ZLIB_PATH=../../$(ZLIB) ZLIB=1 IPV6=1 ARCH=w64 \
+	ZLIB_PATH=../../$(ZLIB) ARCH=w64 \
 	$(MAKE) -C build64/$(CURL)/lib -f Makefile.m32 \
 		CROSSPREFIX="$(PREFIX64)" \
 		CURL_CFLAG_EXTRAS="$(CURL_CFLAG_EXTRAS)" \
+		CFG="$(CURL_CFG)" \
 		libcurl.a
 	touch $@
 
