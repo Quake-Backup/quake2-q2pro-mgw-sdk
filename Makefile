@@ -4,10 +4,10 @@ PREFIX64 := x86_64-w64-mingw32-
 ZLIB_VER := 1.2.11
 JPEG_VER := 9d
 PNG_VER := 1.6.37
-CURL_VER := 7.68.0
-OPENAL_VER := 1.20.1
-OPENGL_VER := 5f3fea090d8df5638b6df385c8b431f51b284651
-EGL_VER := aa9b63f3ab18aee92c95786a2478156430f809e4
+CURL_VER := 7.78.0
+OPENAL_VER := 1.21.1
+OPENGL_VER := 6eca3c2cdc3d1a1147302052e1f1f61cc487b79b
+EGL_VER := 745e9ad435ad10323d0f42da1f279ad3cae2dba3
 
 ZLIB := zlib-$(ZLIB_VER)
 JPEG := jpeg-$(JPEG_VER)
@@ -49,7 +49,7 @@ $(CURL_TAR):
 	wget https://curl.haxx.se/download/$(CURL_TAR)
 
 $(OPENAL_TAR):
-	wget http://kcat.strangesoft.net/openal-releases/$(OPENAL_TAR)
+	wget http://openal-soft.org/openal-releases/$(OPENAL_TAR)
 
 glext.h:
 	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/glext.h
