@@ -26,9 +26,10 @@ ALL_TAR := $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h 
 CURL_CFLAG_EXTRAS := -DCURL_STATICLIB -DHTTP_ONLY -DCURL_DISABLE_CRYPTO_AUTH
 CURL_CFG := -zlib -ipv6 -winssl
 
-INC := $(DESTDIR)inc
-LIB := $(DESTDIR)lib
-LIB64 := $(DESTDIR)lib64
+DESTDIR ?= .
+INC := $(DESTDIR)/inc
+LIB := $(DESTDIR)/lib
+LIB64 := $(DESTDIR)/lib64
 
 all: zlib jpeg png curl zlib64 jpeg64 png64 curl64
 
