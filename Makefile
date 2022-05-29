@@ -1,13 +1,13 @@
 PREFIX := i686-w64-mingw32-
 PREFIX64 := x86_64-w64-mingw32-
 
-ZLIB_VER := 1.2.11
-JPEG_VER := 9d
+ZLIB_VER := 1.2.12
+JPEG_VER := 9e
 PNG_VER := 1.6.37
-CURL_VER := 7.78.0
-OPENAL_VER := 1.21.1
-OPENGL_VER := 6eca3c2cdc3d1a1147302052e1f1f61cc487b79b
-EGL_VER := 745e9ad435ad10323d0f42da1f279ad3cae2dba3
+CURL_VER := 7.83.1
+OPENAL_VER := 1.22.0
+OPENGL_VER := 3f46e23b3875c0ab5674d8d6807d993c00ed6317
+EGL_VER := 84f25dd4c04a01ea48480f7296ba9d64d435fa87
 
 ZLIB := zlib-$(ZLIB_VER)
 JPEG := jpeg-$(JPEG_VER)
@@ -15,7 +15,7 @@ PNG := libpng-$(PNG_VER)
 CURL := curl-$(CURL_VER)
 OPENAL := openal-soft-$(OPENAL_VER)
 
-ZLIB_TAR := $(ZLIB).tar.gz
+ZLIB_TAR := $(ZLIB).tar.xz
 JPEG_TAR := jpegsrc.v$(JPEG_VER).tar.gz
 PNG_TAR := $(PNG).tar.xz
 CURL_TAR := $(CURL).tar.xz
@@ -24,7 +24,7 @@ OPENAL_TAR := $(OPENAL).tar.bz2
 ALL_TAR := $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h khrplatform.h
 
 CURL_CFLAG_EXTRAS := -DCURL_STATICLIB -DHTTP_ONLY -DCURL_DISABLE_CRYPTO_AUTH
-CURL_CFG := -zlib -ipv6 -winssl
+CURL_CFG := -zlib -ipv6 -schannel
 
 DESTDIR ?= .
 INC := $(DESTDIR)/inc
