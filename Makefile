@@ -38,19 +38,19 @@ default: all
 .PHONY: clean install
 
 $(ZLIB_TAR):
-	wget http://www.zlib.net/$(ZLIB_TAR)
+	wget https://www.zlib.net/$(ZLIB_TAR)
 
 $(JPEG_TAR):
-	wget http://ijg.org/files/$(JPEG_TAR)
+	wget https://ijg.org/files/$(JPEG_TAR)
 
 $(PNG_TAR):
-	wget http://downloads.sourceforge.net/sourceforge/libpng/$(PNG_TAR)
+	wget https://downloads.sourceforge.net/sourceforge/libpng/$(PNG_TAR)
 
 $(CURL_TAR):
 	wget https://curl.haxx.se/download/$(CURL_TAR)
 
 $(OPENAL_TAR):
-	wget http://openal-soft.org/openal-releases/$(OPENAL_TAR)
+	wget https://openal-soft.org/openal-releases/$(OPENAL_TAR)
 
 glext.h:
 	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/glext.h
