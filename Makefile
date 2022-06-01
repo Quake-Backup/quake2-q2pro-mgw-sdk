@@ -111,7 +111,7 @@ png-stamp: zlib-stamp
 		RC="$(PREFIX)windres" \
 		STRIP="$(PREFIX)strip" \
 		ZLIBINC=../$(ZLIB) \
-		ZLINLIB=../$(ZLIB) \
+		ZLIBLIB=../$(ZLIB) \
 		libpng.a
 	touch $@
 
@@ -151,7 +151,7 @@ png64-stamp: zlib64-stamp
 		RC="$(PREFIX64)windres" \
 		STRIP="$(PREFIX64)strip" \
 		ZLIBINC=../$(ZLIB) \
-		ZLINLIB=../$(ZLIB) \
+		ZLIBLIB=../$(ZLIB) \
 		libpng.a
 	touch $@
 
