@@ -15,6 +15,9 @@ PNG := libpng-$(PNG_VER)
 CURL := curl-$(CURL_VER)
 OPENAL := openal-soft-$(OPENAL_VER)
 
+DL_DIR := cache
+DL_CMD := wget -P $(DL_DIR)
+
 ZLIB_TAR := $(ZLIB).tar.xz
 JPEG_TAR := jpegsrc.v$(JPEG_VER).tar.gz
 PNG_TAR := $(PNG).tar.xz
@@ -22,6 +25,7 @@ CURL_TAR := $(CURL).tar.xz
 OPENAL_TAR := $(OPENAL).tar.bz2
 
 ALL_TAR := $(ZLIB_TAR) $(JPEG_TAR) $(PNG_TAR) $(CURL_TAR) $(OPENAL_TAR) glext.h wglext.h khrplatform.h
+ALL_TAR := $(patsubst %,$(DL_DIR)/%,$(ALL_TAR))
 
 CURL_CFLAG_EXTRAS := -DCURL_STATICLIB -DHTTP_ONLY -DCURL_DISABLE_CRYPTO_AUTH
 CURL_CFG := -zlib -ipv6 -schannel
@@ -35,31 +39,31 @@ all: zlib jpeg png curl zlib64 jpeg64 png64 curl64
 
 default: all
 
-.PHONY: clean install
+.PHONY: clean distclean install
 
-$(ZLIB_TAR):
-	wget https://www.zlib.net/$(ZLIB_TAR)
+$(DL_DIR)/$(ZLIB_TAR):
+	$(DL_CMD) https://www.zlib.net/$(ZLIB_TAR)
 
-$(JPEG_TAR):
-	wget https://ijg.org/files/$(JPEG_TAR)
+$(DL_DIR)/$(JPEG_TAR):
+	$(DL_CMD) https://ijg.org/files/$(JPEG_TAR)
 
-$(PNG_TAR):
-	wget https://downloads.sourceforge.net/sourceforge/libpng/$(PNG_TAR)
+$(DL_DIR)/$(PNG_TAR):
+	$(DL_CMD) https://downloads.sourceforge.net/sourceforge/libpng/$(PNG_TAR)
 
-$(CURL_TAR):
-	wget https://curl.haxx.se/download/$(CURL_TAR)
+$(DL_DIR)/$(CURL_TAR):
+	$(DL_CMD) https://curl.haxx.se/download/$(CURL_TAR)
 
-$(OPENAL_TAR):
-	wget https://openal-soft.org/openal-releases/$(OPENAL_TAR)
+$(DL_DIR)/$(OPENAL_TAR):
+	$(DL_CMD) https://openal-soft.org/openal-releases/$(OPENAL_TAR)
 
-glext.h:
-	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/glext.h
+$(DL_DIR)/glext.h:
+	$(DL_CMD) https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/glext.h
 
-wglext.h:
-	wget https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/wglext.h
+$(DL_DIR)/wglext.h:
+	$(DL_CMD) https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/$(OPENGL_VER)/api/GL/wglext.h
 
-khrplatform.h:
-	wget https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/$(EGL_VER)/api/KHR/khrplatform.h
+$(DL_DIR)/khrplatform.h:
+	$(DL_CMD) https://raw.githubusercontent.com/KhronosGroup/EGL-Registry/$(EGL_VER)/api/KHR/khrplatform.h
 
 fetch: fetch-stamp
 fetch-stamp: $(ALL_TAR)
@@ -72,15 +76,15 @@ genchecksum: $(ALL_TAR)
 extract: extract-stamp
 extract-stamp: fetch-stamp
 	mkdir -p build build64
-	tar -C build -xf $(ZLIB_TAR)
-	tar -C build -xf $(JPEG_TAR)
-	tar -C build -xf $(PNG_TAR)
-	tar -C build -xf $(CURL_TAR)
-	tar -C build -xf $(OPENAL_TAR) $(OPENAL)/include/AL
-	tar -C build64 -xf $(ZLIB_TAR)
-	tar -C build64 -xf $(JPEG_TAR)
-	tar -C build64 -xf $(PNG_TAR)
-	tar -C build64 -xf $(CURL_TAR)
+	tar -C build -xf $(DL_DIR)/$(ZLIB_TAR)
+	tar -C build -xf $(DL_DIR)/$(JPEG_TAR)
+	tar -C build -xf $(DL_DIR)/$(PNG_TAR)
+	tar -C build -xf $(DL_DIR)/$(CURL_TAR)
+	tar -C build -xf $(DL_DIR)/$(OPENAL_TAR) $(OPENAL)/include/AL
+	tar -C build64 -xf $(DL_DIR)/$(ZLIB_TAR)
+	tar -C build64 -xf $(DL_DIR)/$(JPEG_TAR)
+	tar -C build64 -xf $(DL_DIR)/$(PNG_TAR)
+	tar -C build64 -xf $(DL_DIR)/$(CURL_TAR)
 	cp -a build/$(JPEG)/jconfig.vc build/$(JPEG)/jconfig.h
 	cp -a build64/$(JPEG)/jconfig.vc build64/$(JPEG)/jconfig.h
 	touch $@
@@ -169,6 +173,9 @@ clean:
 	rm -rf build build64
 	rm -f *-stamp
 
+distclean: clean
+	rm -rf cache
+
 install: all
 	install -d $(INC) $(LIB) $(LIB64) $(INC)/curl $(INC)/AL $(INC)/GL $(INC)/KHR
 	install -m 644 build/$(ZLIB)/zconf.h $(INC)/zconf.h
@@ -188,6 +195,6 @@ install: all
 	install -m 644 build64/$(JPEG)/libjpeg.a $(LIB64)/libjpeg.a
 	install -m 644 build64/$(PNG)/libpng.a $(LIB64)/libpng.a
 	install -m 644 build64/$(CURL)/lib/libcurl.a $(LIB64)/libcurl.a
-	install -m 644 glext.h wglext.h $(INC)/GL
-	install -m 644 khrplatform.h $(INC)/KHR
+	install -m 644 $(DL_DIR)/glext.h $(DL_DIR)/wglext.h $(INC)/GL
+	install -m 644 $(DL_DIR)/khrplatform.h $(INC)/KHR
 	install -m 644 build/$(OPENAL)/include/AL/* $(INC)/AL
