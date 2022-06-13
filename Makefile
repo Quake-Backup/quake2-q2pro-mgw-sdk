@@ -35,11 +35,11 @@ INC := $(DESTDIR)/inc
 LIB := $(DESTDIR)/lib
 LIB64 := $(DESTDIR)/lib64
 
-all: zlib jpeg png curl zlib64 jpeg64 png64 curl64
+ALL := zlib jpeg png curl zlib64 jpeg64 png64 curl64
 
-default: all
+all: $(ALL)
 
-.PHONY: clean distclean install
+.PHONY: fetch extract genchecksum $(ALL) clean distclean install
 
 $(DL_DIR)/$(ZLIB_TAR):
 	$(DL_CMD) https://www.zlib.net/$(ZLIB_TAR)
