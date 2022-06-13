@@ -2,7 +2,7 @@ PREFIX := i686-w64-mingw32-
 PREFIX64 := x86_64-w64-mingw32-
 
 ZLIB_VER := 1.2.12
-JPEG_VER := 9e
+JPEG_VER := 2.1.3
 PNG_VER := 1.6.37
 CURL_VER := 7.83.1
 OPENAL_VER := 1.22.0
@@ -10,7 +10,7 @@ OPENGL_VER := 3f46e23b3875c0ab5674d8d6807d993c00ed6317
 EGL_VER := 84f25dd4c04a01ea48480f7296ba9d64d435fa87
 
 ZLIB := zlib-$(ZLIB_VER)
-JPEG := jpeg-$(JPEG_VER)
+JPEG := libjpeg-turbo-$(JPEG_VER)
 PNG := libpng-$(PNG_VER)
 CURL := curl-$(CURL_VER)
 OPENAL := openal-soft-$(OPENAL_VER)
@@ -19,7 +19,7 @@ DL_DIR := cache
 DL_CMD := wget -P $(DL_DIR)
 
 ZLIB_TAR := $(ZLIB).tar.xz
-JPEG_TAR := jpegsrc.v$(JPEG_VER).tar.gz
+JPEG_TAR := $(JPEG).tar.gz
 PNG_TAR := $(PNG).tar.xz
 CURL_TAR := $(CURL).tar.xz
 OPENAL_TAR := $(OPENAL).tar.bz2
@@ -45,7 +45,7 @@ $(DL_DIR)/$(ZLIB_TAR):
 	$(DL_CMD) https://www.zlib.net/$(ZLIB_TAR)
 
 $(DL_DIR)/$(JPEG_TAR):
-	$(DL_CMD) https://ijg.org/files/$(JPEG_TAR)
+	$(DL_CMD) https://downloads.sourceforge.net/sourceforge/libjpeg-turbo/$(JPEG_TAR)
 
 $(DL_DIR)/$(PNG_TAR):
 	$(DL_CMD) https://downloads.sourceforge.net/sourceforge/libpng/$(PNG_TAR)
@@ -82,11 +82,8 @@ extract-stamp: fetch-stamp
 	tar -C build -xf $(DL_DIR)/$(CURL_TAR)
 	tar -C build -xf $(DL_DIR)/$(OPENAL_TAR) $(OPENAL)/include/AL
 	tar -C build64 -xf $(DL_DIR)/$(ZLIB_TAR)
-	tar -C build64 -xf $(DL_DIR)/$(JPEG_TAR)
 	tar -C build64 -xf $(DL_DIR)/$(PNG_TAR)
 	tar -C build64 -xf $(DL_DIR)/$(CURL_TAR)
-	cp -a build/$(JPEG)/jconfig.vc build/$(JPEG)/jconfig.h
-	cp -a build64/$(JPEG)/jconfig.vc build64/$(JPEG)/jconfig.h
 	touch $@
 
 zlib: zlib-stamp
@@ -98,12 +95,11 @@ zlib-stamp: extract-stamp
 
 jpeg: jpeg-stamp
 jpeg-stamp: extract-stamp
-	$(MAKE) -C build/$(JPEG) -f makefile.ansi \
-		CC="$(PREFIX)gcc" \
-		CFLAGS=-O2 \
-		AR="$(PREFIX)ar rc" \
-		AR2="$(PREFIX)ranlib" \
-		libjpeg.a
+	cmake -G"Unix Makefiles" \
+		-DCMAKE_TOOLCHAIN_FILE=$(CURDIR)/cmake/toolchain.cmake \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build/jpeg-install \
+		-DENABLE_SHARED=0 -S build/$(JPEG) -B build/jpeg-build
+	$(MAKE) -C build/jpeg-build jpeg-static
 	touch $@
 
 png: png-stamp
@@ -138,12 +134,11 @@ zlib64-stamp: extract-stamp
 
 jpeg64: jpeg64-stamp
 jpeg64-stamp: extract-stamp
-	$(MAKE) -C build64/$(JPEG) -f makefile.ansi \
-		CC="$(PREFIX64)gcc" \
-		CFLAGS=-O2 \
-		AR="$(PREFIX64)ar rc" \
-		AR2="$(PREFIX64)ranlib" \
-		libjpeg.a
+	cmake -G"Unix Makefiles" \
+		-DCMAKE_TOOLCHAIN_FILE=$(CURDIR)/cmake/toolchain64.cmake \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/build64/jpeg-install \
+		-DENABLE_SHARED=0 -S build/$(JPEG) -B build64/jpeg-build
+	$(MAKE) -C build64/jpeg-build jpeg-static
 	touch $@
 
 png64: png64-stamp
@@ -182,9 +177,9 @@ install: all
 	install -m 644 build/$(ZLIB)/zlib.h $(INC)/zlib.h
 	install -m 644 build/$(ZLIB)/libz.a $(LIB)/libz.a
 	install -m 644 build/$(JPEG)/jpeglib.h $(INC)/jpeglib.h
-	install -m 644 build/$(JPEG)/jconfig.h $(INC)/jconfig.h
 	install -m 644 build/$(JPEG)/jmorecfg.h $(INC)/jmorecfg.h
-	install -m 644 build/$(JPEG)/libjpeg.a $(LIB)/libjpeg.a
+	install -m 644 build/jpeg-build/jconfig.h $(INC)/jconfig.h
+	install -m 644 build/jpeg-build/libjpeg.a $(LIB)/libjpeg.a
 	install -m 644 build/$(PNG)/pngconf.h $(INC)/pngconf.h
 	install -m 644 build/$(PNG)/png.h $(INC)/png.h
 	install -m 644 build/$(PNG)/pnglibconf.h $(INC)/pnglibconf.h
@@ -192,7 +187,7 @@ install: all
 	install -m 644 build/$(CURL)/include/curl/*.h $(INC)/curl
 	install -m 644 build/$(CURL)/lib/libcurl.a $(LIB)/libcurl.a
 	install -m 644 build64/$(ZLIB)/libz.a $(LIB64)/libz.a
-	install -m 644 build64/$(JPEG)/libjpeg.a $(LIB64)/libjpeg.a
+	install -m 644 build64/jpeg-build/libjpeg.a $(LIB64)/libjpeg.a
 	install -m 644 build64/$(PNG)/libpng.a $(LIB64)/libpng.a
 	install -m 644 build64/$(CURL)/lib/libcurl.a $(LIB64)/libcurl.a
 	install -m 644 $(DL_DIR)/glext.h $(DL_DIR)/wglext.h $(INC)/GL
